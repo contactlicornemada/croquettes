@@ -320,6 +320,43 @@
     const SUPABASE_URL = 'https://galfzyrjjjmwkorsqusw.supabase.co/rest/v1/';
     const API_KEY = 'sb_publishable_ikJvGHdDKXvlt4ybL83TwQ_-GCyF1Ii';
 
+    // ---- TRACKING ----
+    // Le lien est identifié par ?lien=a (ex: index.html?lien=a).
+    // Si aucun paramètre n'est fourni, le lien "default" est utilisé.
+    const TRACKING_LINK = new URLSearchParams(window.location.search).get('lien') || 'default';
+
+    // Appelle une fonction RPC Supabase qui incrémente atomiquement un compteur.
+    async function incrementTracking(field) {
+      try {
+        const response = await fetch(`${SUPABASE_URL}rpc/increment_tracking`, {
+          method: 'POST',
+          headers: {
+            'apikey': API_KEY,
+            'Authorization': `Bearer ${API_KEY}`,
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify({
+            p_lien: TRACKING_LINK,
+            p_field: field
+          })
+        });
+
+        if (!response.ok) {
+          console.error(`Tracking ${field} : HTTP ${response.status}`, await response.text());
+        }
+      } catch (err) {
+        // Le tracking ne doit jamais empêcher le formulaire de fonctionner.
+        console.error(`Erreur tracking ${field}:`, err);
+      }
+    }
+
+    async function initTracking() {
+      // La fonction RPC crée la ligne si le lien n'existe pas encore,
+      // puis incrémente visiteurs pour cette visite.
+      await incrementTracking('visiteurs');
+    }
+
     // ---- ÉTAT ----
     let selectedAge = null;
     let selectedSize = null;
@@ -583,6 +620,8 @@
       document.querySelectorAll('.product-card').forEach(card => {
         card.addEventListener('click', () => {
           const idx = parseInt(card.dataset.index, 10);
+          // 1 clic sur une fiche produit = +1 dans tracking.clic
+          incrementTracking('clic');
           openModal(currentProducts[idx]);
         });
       });
@@ -651,6 +690,9 @@
     submitBtn.addEventListener('click', async () => {
       if (!selectedAge || !selectedSize || !selectedType) return;
 
+      // 1 soumission valide du questionnaire = +1 dans tracking.submit
+      incrementTracking('submit');
+
       formSection.style.display = 'none';
       resultsSection.style.display = 'block';
 
@@ -671,6 +713,7 @@
 
     // ---- DÉMARRAGE ----
     updateSubmitState();
+    initTracking();
     preloadProducts();
   })();
 </script>
