@@ -80,44 +80,13 @@
 
     .options-grid{display:flex;flex-wrap:wrap;gap:.75rem}
     .option-btn{background:#fff;border:2px solid var(--sand);border-radius:60px;padding:.8rem 1.5rem;font-size:1rem;font-weight:600;
-      color:var(--cocoa);cursor:pointer;transition:transform .2s var(--ease),background .2s,border-color .2s,box-shadow .2s,opacity .2s;
+      color:var(--cocoa);cursor:pointer;transition:transform .2s var(--ease),background .2s,border-color .2s,box-shadow .2s;
       display:flex;align-items:center;gap:.5rem;box-shadow:0 3px 8px -4px rgba(120,70,30,.25);text-align:left;min-height:44px}
-    .option-btn:hover:not(:disabled){background:#fff4de;border-color:var(--honey);transform:translateY(-2px) rotate(-.6deg)}
-    .option-btn:active:not(:disabled){transform:scale(.97)}
+    .option-btn:hover{background:#fff4de;border-color:var(--honey);transform:translateY(-2px) rotate(-.6deg)}
+    .option-btn:active{transform:scale(.97)}
     .option-btn.selected{background:var(--terra);color:#fff;border-color:var(--terra-d);box-shadow:0 12px 20px -8px rgba(200,100,60,.55);animation:pop .35s var(--ease)}
     .option-btn.selected::before{content:"✓";font-weight:800;margin-right:6px;color:#ffe3b0}
-    .option-btn.selected:disabled{background:var(--terra);opacity:.5}
     @keyframes pop{0%{transform:scale(.94)}60%{transform:scale(1.04)}100%{transform:scale(1)}}
-
-    /* ===== Boutons désactivés (combinaisons sans résultat) ===== */
-    .option-btn:disabled,
-    .option-btn.disabled {
-      opacity: .35;
-      cursor: not-allowed;
-      filter: grayscale(65%);
-      transform: none !important;
-      box-shadow: none !important;
-      pointer-events: auto; /* on garde le curseur not-allowed visible */
-      position: relative;
-    }
-    .option-btn:disabled:hover,
-    .option-btn.disabled:hover{background:#fff;border-color:var(--sand)}
-    .option-btn:disabled::after,
-    .option-btn.disabled::after{
-      content: "indisponible";
-      font-size: .68em;
-      font-style: italic;
-      font-weight: 500;
-      background: #e8d4b2;
-      color: #7a5a47;
-      padding: .1rem .45rem;
-      border-radius: 6px;
-      margin-left: .35rem;
-      text-transform: lowercase;
-      letter-spacing: 0;
-    }
-    .option-btn.selected:disabled::after,
-    .option-btn.selected.disabled::after{background: rgba(255,255,255,.3); color: #fff;}
 
     .actions{display:flex;gap:1rem;justify-content:flex-end;margin-top:2rem;border-top:2px dashed #e6d3b3;padding-top:1.8rem}
     .btn{padding:.9rem 2.2rem;border-radius:60px;font-weight:700;font-size:1rem;border:none;cursor:pointer;transition:transform .2s var(--ease),background .2s;min-height:48px}
@@ -136,6 +105,7 @@
 
     .products-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:2rem 1.8rem;margin-top:1rem;padding:.5rem}
     .product-card{background:#fff;border-radius:1.4rem;overflow:hidden;box-shadow:0 14px 24px -12px rgba(120,70,30,.35);
+      scroll-margin-top:18px;
       border:6px solid #fff;outline:1px solid #ead8bb;transition:transform .3s var(--ease),box-shadow .3s;display:flex;flex-direction:column;cursor:pointer;
       opacity:0;animation:cardIn .8s var(--ease) forwards;transform:rotate(var(--rot,0deg))}
     .product-card:nth-child(4n+1){--rot:-1.4deg;animation-delay:.05s}
@@ -151,9 +121,14 @@
     .product-image::after{content:"Voir les détails";position:absolute;inset:0;background:linear-gradient(0deg,rgba(74,48,35,.75),rgba(74,48,35,.15));
       color:#fff;display:flex;align-items:flex-end;justify-content:center;padding-bottom:1.1rem;font-weight:700;font-size:1.05rem;opacity:0;transition:opacity .25s;letter-spacing:.02em}
     .product-card:hover .product-image::after{opacity:1}
-    .product-info{padding:1rem .8rem .9rem}
+    .product-info{padding:1rem .8rem 1rem}
     .product-name{font-family:var(--serif);font-size:1.15rem;font-weight:700;color:var(--cocoa);line-height:1.3}
     .product-meta{font-size:.82rem;color:var(--cocoa-l);margin-top:.5rem}
+    .product-description{font-size:.9rem;color:var(--cocoa-l);line-height:1.5;margin-top:.65rem}
+    .product-description-text{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+    .read-more-btn{margin-top:.7rem;padding:.5rem .85rem;border:1px solid #e2cda9;border-radius:999px;background:#fff8ea;color:var(--terra-d);
+      font:700 .84rem var(--sans);cursor:pointer;transition:background .2s,transform .2s,border-color .2s}
+    .read-more-btn:hover{background:#fff0d3;border-color:var(--honey);transform:translateY(-1px)}
 
     .no-results{text-align:center;padding:3rem 1.5rem;background:#fff8ea;border-radius:2rem;color:var(--cocoa-l);font-size:1.1rem;border:2px dashed #e0c79b}
     .loading{text-align:center;padding:2rem;color:var(--terra-d);font-weight:700;grid-column:1/-1;animation:breathe 1.4s ease-in-out infinite}
@@ -190,6 +165,7 @@
       .option-btn{padding:.65rem 1.1rem;font-size:.92rem}
       .products-grid{grid-template-columns:1fr}
       .product-image{height:240px}
+      .product-description{font-size:.88rem}
       .modal-image{height:240px}
       .modal-body{padding:1.3rem 1.3rem 1.8rem}
       .modal-title{font-size:1.35rem}
@@ -316,54 +292,15 @@
 
 <script>
   (function() {
-    // ---- CONFIG SUPABASE ----
+    // ---- CONFIG SUPABASE (clés vérifiées) ----
     const SUPABASE_URL = 'https://galfzyrjjjmwkorsqusw.supabase.co/rest/v1/';
     const API_KEY = 'sb_publishable_ikJvGHdDKXvlt4ybL83TwQ_-GCyF1Ii';
-
-    // ---- TRACKING ----
-    // Le lien est identifié par ?lien=a (ex: index.html?lien=a).
-    // Si aucun paramètre n'est fourni, le lien "default" est utilisé.
-    const TRACKING_LINK = new URLSearchParams(window.location.search).get('lien') || 'default';
-
-    // Appelle une fonction RPC Supabase qui incrémente atomiquement un compteur.
-    async function incrementTracking(field) {
-      try {
-        const response = await fetch(`${SUPABASE_URL}rpc/increment_tracking`, {
-          method: 'POST',
-          headers: {
-            'apikey': API_KEY,
-            'Authorization': `Bearer ${API_KEY}`,
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-          },
-          body: JSON.stringify({
-            p_lien: TRACKING_LINK,
-            p_field: field
-          })
-        });
-
-        if (!response.ok) {
-          console.error(`Tracking ${field} : HTTP ${response.status}`, await response.text());
-        }
-      } catch (err) {
-        // Le tracking ne doit jamais empêcher le formulaire de fonctionner.
-        console.error(`Erreur tracking ${field}:`, err);
-      }
-    }
-
-    async function initTracking() {
-      // La fonction RPC crée la ligne si le lien n'existe pas encore,
-      // puis incrémente visiteurs pour cette visite.
-      await incrementTracking('visiteurs');
-    }
 
     // ---- ÉTAT ----
     let selectedAge = null;
     let selectedSize = null;
     let selectedType = null;
     let currentProducts = [];
-    let ALL_PRODUCTS = [];        // cache de tous les produits
-    let VALID_COMBOS = new Set(); // combinaisons valides "age|taille|type"
 
     // ---- DOM ----
     const formSection = document.getElementById('formSection');
@@ -397,153 +334,30 @@
 
     const PLACEHOLDER = 'https://placehold.co/600x400/e2e8f0/64748b?text=Photo+indisponible';
 
-    const ALL_SIZES = ['petite', 'moyenne', 'grande', 'très grande'];
-    const ALL_TYPES = ['1', '2', '3', '4'];
-    const ALL_AGES  = ['Chiot', 'Adulte'];
-
-    // ---- MATCH PRODUIT / FILTRES ----
-    function matchesFilters(product, age, size, type) {
-      const dogAge = (product.dog_age || '').toString().trim().toLowerCase();
-      if (dogAge !== age.toLowerCase()) return false;
-
-      if (String(product.type).trim() !== String(type)) return false;
-
-      const dogSize = (product.dog_size || '').toLowerCase().trim();
-      if (dogSize.includes('toutes')) return true;
-
-      switch (size) {
-        case 'petite':      return dogSize.includes('petite');
-        case 'moyenne':     return dogSize.includes('moyenne');
-        case 'grande':      return dogSize.includes('grande');
-        case 'très grande': return dogSize.includes('très grande') || dogSize.includes('tres grande');
-        default: return false;
-      }
-    }
-
-    // ---- PRÉCHARGEMENT + CALCUL DES COMBINAISONS VALIDES ----
-    async function preloadProducts() {
-      try {
-        const url = `${SUPABASE_URL}products?select=*`;
-        const response = await fetch(url, {
-          headers: {
-            'apikey': API_KEY,
-            'Authorization': `Bearer ${API_KEY}`,
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-          }
-        });
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        ALL_PRODUCTS = await response.json();
-        console.log('📦 Produits préchargés :', ALL_PRODUCTS);
-        computeValidCombos();
-        refreshDisabledStates();
-      } catch (err) {
-        console.error('Impossible de précharger :', err);
-      }
-    }
-
-    function computeValidCombos() {
-      VALID_COMBOS.clear();
-      ALL_AGES.forEach(age => {
-        ALL_SIZES.forEach(size => {
-          ALL_TYPES.forEach(type => {
-            const has = ALL_PRODUCTS.some(p => matchesFilters(p, age, size, type));
-            if (has) VALID_COMBOS.add(`${age}|${size}|${type}`);
-          });
-        });
-      });
-      console.log('✅ Combinaisons valides :', [...VALID_COMBOS]);
-    }
-
-    // ---- DÉSACTIVATION INTELLIGENTE ----
-    function refreshDisabledStates() {
-      // Si pas encore chargé, on ne désactive rien
-      if (!ALL_PRODUCTS.length) return;
-
-      // --- ÂGE : actif si au moins une combinaison existe avec cet âge
-      ageButtons.forEach(btn => {
-        const age = btn.dataset.value;
-        const possible = ALL_SIZES.some(size =>
-          ALL_TYPES.some(type => VALID_COMBOS.has(`${age}|${size}|${type}`))
-        );
-        applyDisabled(btn, !possible);
-      });
-
-      // --- TAILLE : dépend de l'âge si choisi
-      sizeButtons.forEach(btn => {
-        const size = btn.dataset.value;
-        const ages = selectedAge ? [selectedAge] : ALL_AGES;
-        const possible = ages.some(age =>
-          ALL_TYPES.some(type => VALID_COMBOS.has(`${age}|${size}|${type}`))
-        );
-        applyDisabled(btn, !possible);
-      });
-
-      // --- TYPE : dépend de l'âge ET de la taille si choisis
-      typeButtons.forEach(btn => {
-        const type = btn.dataset.value;
-        const ages  = selectedAge  ? [selectedAge]  : ALL_AGES;
-        const sizes = selectedSize ? [selectedSize] : ALL_SIZES;
-        const possible = ages.some(age =>
-          sizes.some(size => VALID_COMBOS.has(`${age}|${size}|${type}`))
-        );
-        applyDisabled(btn, !possible);
-      });
-
-      // --- Si une sélection courante est devenue invalide, on la désélectionne
-      if (selectedAge && selectedSize && selectedType &&
-          !VALID_COMBOS.has(`${selectedAge}|${selectedSize}|${selectedType}`)) {
-        // On désélectionne le type (le plus spécifique)
-        clearSelected(typeButtons);
-        selectedType = null;
-      }
-
-      updateSubmitState();
-    }
-
-    function applyDisabled(btn, disabled) {
-      btn.disabled = disabled;
-      btn.classList.toggle('disabled', disabled);
-      // si on désactive, on retire aussi la sélection visuelle
-      if (disabled && btn.classList.contains('selected')) {
-        btn.classList.remove('selected');
-        // et on vide la variable correspondante
-        if (btn.dataset.value === selectedAge) selectedAge = null;
-        if (btn.dataset.value === selectedSize) selectedSize = null;
-        if (btn.dataset.value === selectedType) selectedType = null;
-      }
-    }
-
     // ---- SÉLECTIONS ----
     function clearSelected(buttons) {
       buttons.forEach(btn => btn.classList.remove('selected'));
     }
 
     ageButtons.forEach(btn => btn.addEventListener('click', () => {
-      if (btn.disabled) return;
       clearSelected(ageButtons);
       btn.classList.add('selected');
       selectedAge = btn.dataset.value;
       updateSubmitState();
-      refreshDisabledStates();
     }));
 
     sizeButtons.forEach(btn => btn.addEventListener('click', () => {
-      if (btn.disabled) return;
       clearSelected(sizeButtons);
       btn.classList.add('selected');
       selectedSize = btn.dataset.value;
       updateSubmitState();
-      refreshDisabledStates();
     }));
 
     typeButtons.forEach(btn => btn.addEventListener('click', () => {
-      if (btn.disabled) return;
       clearSelected(typeButtons);
       btn.classList.add('selected');
       selectedType = btn.dataset.value;
       updateSubmitState();
-      refreshDisabledStates();
     }));
 
     function updateSubmitState() {
@@ -556,22 +370,60 @@
       clearSelected(typeButtons);
       selectedAge = selectedSize = selectedType = null;
       updateSubmitState();
-      refreshDisabledStates();
     }
 
     resetFormBtn.addEventListener('click', resetForm);
 
-    // ---- RÉCUPÉRATION + FILTRAGE (au clic "Voir") ----
+    // ---- RÉCUPÉRATION + FILTRAGE ----
     async function fetchAndFilterProducts() {
       productsContainer.innerHTML = '<div class="loading">Chargement des produits…</div>';
       noResultsMessage.style.display = 'none';
 
       try {
-        const filtered = ALL_PRODUCTS.filter(p =>
-          matchesFilters(p, selectedAge, selectedSize, selectedType)
-        );
+        const url = `${SUPABASE_URL}products?select=*`;
+
+        // ✅ Headers complets : apikey + Authorization + Content-Type + Accept
+        const response = await fetch(url, {
+          headers: {
+            'apikey': API_KEY,
+            'Authorization': `Bearer ${API_KEY}`,
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          }
+        });
+
+        if (!response.ok) {
+          const errText = await response.text();
+          throw new Error(`HTTP ${response.status} — ${errText}`);
+        }
+
+        const allProducts = await response.json();
+        console.log('📦 Produits Supabase :', allProducts);
+
+        const filtered = allProducts.filter(product => {
+          // Âge
+          const dogAge = (product.dog_age || '').toString().trim().toLowerCase();
+          if (dogAge !== selectedAge.toLowerCase()) return false;
+
+          // Type
+          if (String(product.type).trim() !== String(selectedType)) return false;
+
+          // Taille
+          const dogSize = (product.dog_size || '').toLowerCase().trim();
+          if (dogSize.includes('toutes')) return true;
+
+          switch (selectedSize) {
+            case 'petite':      return dogSize.includes('petite');
+            case 'moyenne':     return dogSize.includes('moyenne');
+            case 'grande':      return dogSize.includes('grande');
+            case 'très grande': return dogSize.includes('très grande') || dogSize.includes('tres grande');
+            default: return false;
+          }
+        });
+
         console.log('🎯 Produits filtrés :', filtered);
         return filtered;
+
       } catch (error) {
         console.error(error);
         productsContainer.innerHTML = `<div class="no-results">❌ Erreur : ${error.message}</div>`;
@@ -601,6 +453,9 @@
         if (p.dog_age) metaParts.push(p.dog_age);
         if (p.dog_size) metaParts.push(p.dog_size);
 
+        const description = (p.description || p.benefits || p.objective || '').toString().trim();
+        const safeDescription = description.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
         html += `
           <div class="product-card" data-index="${index}">
             <div class="product-image">
@@ -610,6 +465,12 @@
             <div class="product-info">
               <div class="product-name">${p.name || 'Sans nom'}</div>
               ${metaParts.length ? `<div class="product-meta">${metaParts.join(' · ')}</div>` : ''}
+              ${safeDescription ? `
+                <div class="product-description">
+                  <div class="product-description-text">${safeDescription}</div>
+                  <button class="read-more-btn" type="button" data-index="${index}">Lire la suite</button>
+                </div>
+              ` : ''}
             </div>
           </div>
         `;
@@ -618,13 +479,41 @@
       productsContainer.innerHTML = html;
 
       document.querySelectorAll('.product-card').forEach(card => {
-        card.addEventListener('click', () => {
+        card.addEventListener('click', (event) => {
           const idx = parseInt(card.dataset.index, 10);
-          // 1 clic sur une fiche produit = +1 dans tracking.clic
-          incrementTracking('clic');
+          if (event.target.closest('.read-more-btn')) return;
           openModal(currentProducts[idx]);
         });
       });
+
+      document.querySelectorAll('.read-more-btn').forEach(button => {
+        button.addEventListener('click', (event) => {
+          event.stopPropagation();
+          const idx = parseInt(button.dataset.index, 10);
+          openModal(currentProducts[idx]);
+        });
+      });
+
+      // Avec plusieurs produits : petit aperçu des suivants, puis retour au premier.
+      if (products.length > 1) {
+        requestAnimationFrame(() => {
+          const firstCard = productsContainer.querySelector('.product-card');
+          if (!firstCard) return;
+
+          const resultsTop = productsContainer.getBoundingClientRect().top + window.scrollY;
+          const revealY = Math.min(
+            resultsTop + Math.max(140, Math.min(260, window.innerHeight * 0.42)),
+            document.documentElement.scrollHeight - window.innerHeight
+          );
+
+          window.scrollTo({ top: revealY, behavior: 'smooth' });
+
+          setTimeout(() => {
+            firstCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            window.scrollBy({ top: -18, behavior: 'smooth' });
+          }, 900);
+        });
+      }
     }
 
     // ---- MODAL ----
@@ -690,11 +579,11 @@
     submitBtn.addEventListener('click', async () => {
       if (!selectedAge || !selectedSize || !selectedType) return;
 
-      // 1 soumission valide du questionnaire = +1 dans tracking.submit
-      incrementTracking('submit');
-
       formSection.style.display = 'none';
       resultsSection.style.display = 'block';
+
+      // Le titre reste le message marketing (défini dans le HTML)
+      // On ne le modifie plus dynamiquement.
 
       const products = await fetchAndFilterProducts();
       if (products !== null) displayProducts(products);
@@ -711,10 +600,7 @@
       closeModal();
     });
 
-    // ---- DÉMARRAGE ----
     updateSubmitState();
-    initTracking();
-    preloadProducts();
   })();
 </script>
 
